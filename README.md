@@ -14,4 +14,4 @@ Simple API I built to create teams and tasks on a todo list. I plan to build out
 Install Postman and use provided test collection
 
 ### Debug in VS Code
-Launch.json will have the necessary steps to start the API given you have the extension [Typescript Debugger](https://marketplace.visualstudio.com/items?itemName=kakumei.ts-debug) installed
+Launch.json will have the necessary steps to start the API given you have the extension [Typescript Debugger](https://marketplace.visualstudio.com/items?itemName=kakumei.ts-debug) installed.
