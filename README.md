@@ -1,6 +1,8 @@
 # Work Manager API
 Simple API I built to create teams and tasks on a todo list. I plan to build out a simple ui to go along with it. I added some nice prioritization features into this as well to build on later.
 
+This API Doesn't currently have a backing database because I was mostly just sharpening up the objects as well as setting up the express backend. Will be adding one soon :)
+
 ### Linting Command
 ```npm run-script prebuild```
 
