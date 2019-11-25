@@ -1,13 +1,13 @@
 # Work Manager API
 
 ### Linting Command
-npm run-script prebuild
+```npm run-script prebuild```
 
 ### Run via ts-node
-npm run-script dev
+```npm run-script dev```
 
 ### Run
-npm start
+```npm start```
 
 ### Testing
 Install Postman and use provided test collection
