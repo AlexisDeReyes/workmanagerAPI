@@ -2,6 +2,7 @@
 import * as express from "express";
 import { Request, RequestHandler } from "express";
 import { CannedResponses, ICannedResponse, SendCannedResponse } from "./Types/CannedResponses";
+import { TeamTaskResponse } from "./Types/CompoundResources";
 import DBContext from "./Types/DBContext";
 import IQueryable from "./Types/IQueryable";
 import { Task, TaskStatus } from "./Types/Task";
@@ -11,6 +12,12 @@ import Team from "./Types/Team";
 const app = express();
 const port = 8080;
 app.use(express.json());
+
+app.all("*", (req, res, next) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Headers", ["Content-Type"]);
+    next();
+});
 
 // Data Storage
 const db = new DBContext();
@@ -32,9 +39,9 @@ const DoOrSendCannedResponse = (thing: any, response: ICannedResponse, req, res,
 app.post("/teams", (req, res) => {
     DoOrSendCannedResponse(db.GetTeam(req.body.name) === undefined,
     CannedResponses.TeamNameExists, req, res, () => {
-        const result = new Team(req.body.name);
-        db.teams.push(result);
-        res.send(JSON.stringify(result));
+        const team = new Team(req.body.name);
+        db.teams.push(team);
+        res.send(JSON.stringify(team));
     });
 });
 
@@ -50,7 +57,7 @@ app.put("/teams/:identifier", (req, res) => {
             CannedResponses.TeamNameExists, req, res,
             () => {
                 team.name = req.body.name;
-                res.send(team);
+                res.send(JSON.stringify(team));
             });
     });
 });
@@ -67,14 +74,14 @@ app.get("/teams/:identifier", (req, res) => {
     res.send(JSON.stringify(db.GetTeam(req.params.identifier)));
 });
 
-// Retrieves by id or name
 app.post("/teams/:identifier/tasks", (req, res) => {
     const team = db.GetTeam(req.params.identifier);
 
     DoOrSendCannedResponse(team, CannedResponses.TeamDoesNotExist, req, res, () => {
         const newTask: Task = Task.TaskFromRequest(req);
         team.AddTask(newTask);
-        res.send(JSON.stringify(newTask));
+        const response = new TeamTaskResponse(team, newTask);
+        res.send(JSON.stringify(response));
     });
 
 });
@@ -86,7 +93,7 @@ app.get("/teams/:identifier/tasks/:taskId", (req, res) => {
         const task = team.GetTask(req.params.taskId);
 
         DoOrSendCannedResponse(task, CannedResponses.TaskDoesNotExist, req, res, () => {
-            res.send(task);
+            res.send(JSON.stringify(task));
         });
     });
 });
@@ -99,7 +106,7 @@ app.delete("/teams/:identifier/tasks/:taskId", (req, res) => {
 
         DoOrSendCannedResponse(task, CannedResponses.TaskDoesNotExist, req, res, () => {
             team.RemoveTask(task);
-            res.send(task);
+            res.send(JSON.stringify(team));
         });
     });
 });
@@ -113,7 +120,7 @@ app.put("/teams/:identifier/tasks/:taskId", (req, res) => {
         DoOrSendCannedResponse(task, CannedResponses.TaskDoesNotExist, req, res, () => {
             DoOrSendCannedResponse(req.body.name, CannedResponses.NeedName, req, res, () => {
                 task.UpdateFromRequest(req);
-                res.send(task);
+                res.send(JSON.stringify(team));
             });
         });
     });
@@ -131,7 +138,7 @@ app.patch("/teams/:identifier/tasks/:taskId/status/:status", (req, res) => {
             DoOrSendCannedResponse(Object.values(TaskStatus).includes(status),
             CannedResponses.InvalidStatus, req, res, () => {
                 team.ChangeTaskStatus(task, status);
-                res.send(task);
+                res.send(JSON.stringify(team));
             });
         });
     });
